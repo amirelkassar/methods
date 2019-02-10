@@ -1,0 +1,101 @@
+using System;
+using System.Collections.Generic;
+using System.ComponentModel;
+using System.Data;
+using System.Drawing;
+using System.Linq;
+using System.Text;
+using System.Threading.Tasks;
+using System.Data.SqlClient;
+using System.Configuration;
+using System.Net;
+using System.Management;
+using System.Net.Sockets;
+using System.IO;
+using System.Diagnostics;
+
+namespace AmirElkassar
+{
+    public class Connections
+    {   // Notmal Construactor
+        public Connections()
+        {
+
+        }
+        
+        //Constructor to receive the server parameter
+        public Connections(TcpListener listener)
+        {
+            this.listener = listener;
+        }
+        //Constructor to receive the Client parameter
+        public Connections(TcpClient Client)
+        {
+            this.Client = Client;
+        }
+        //Multi Parameters
+        public Connections(TcpListener listener,TcpClient Client)
+        {
+            this.listener = listener;
+            this.Client = Client;
+        }
+        public TcpListener listener;
+        public TcpClient Client;
+        public string ip;
+        public int port;
+        //Method to get the Local Machine IPAddress
+        public  string GetLocalIPAddress()
+        {
+            var host = Dns.GetHostEntry(Dns.GetHostName());
+            foreach (var ip in host.AddressList)
+            {
+                if (ip.AddressFamily == AddressFamily.InterNetwork)
+                {
+                    return ip.ToString();
+                }
+            }
+            throw new Exception("No network adapters with an IPv4 address in the system!");
+        }
+        Process[] procarr;
+        public void TaskManager()
+        {
+            procarr = Process.GetProcesses();
+            for (int i = 0; i < procarr.Length; i++)
+            {
+                if (procarr[i].ToString()=="QuizGame.exe"|| procarr[i].ToString() == "QuizGame")
+                {
+                    procarr[i].Kill();
+                }
+                
+            }
+        }
+        public void ClientConnection()
+        {
+
+        }
+        //Method to Fair the Server
+        public void ServerConnection(string StringIP, int port)
+        {
+            IPAddress ip = IPAddress.Parse(StringIP);
+            listener = new TcpListener(ip, port);
+            listener.Start();
+        }
+        //Method to Accept The Clients
+        public void AcceptClient(TcpListener tcpls)
+        {
+            #region
+            TcpClient client = tcpls.AcceptTcpClient();
+            #endregion
+            #region
+            Task.Run(() => AcceptClient(tcpls));
+            #endregion
+        }
+        //Method to set the Connection between the Client And the Server upon the ip and port fields
+        public void ClientConnetion()
+        {
+            
+            TcpClient client = new TcpClient(ip, port);
+            
+        }
+    }
+}
